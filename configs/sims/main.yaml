@@ -1,0 +1,30 @@
+dataset: {name: sims, data_path: data/sims_unaligned_39.pkl, language: cn, train_missing_shared: 1.0}
+train:
+  seed: 1111
+  epochs: 200
+  stop_epoch: 0
+  batch_size: 32
+  lr: 5.0e-05
+  lr_bert: 0.0001
+  weight_decay: 0.0001
+  warmup_ratio: 0.1
+  num_workers: 8
+  select_missing_rate: 0.5
+  loss: {reg_loss: mse, w_csa: 1.0, w_sep: 1.0, sigma: 1.0, tau: 1.0, power_iters: 20,
+    w_aux_sem: 0.0}
+model:
+  feature_extractor:
+    bert_pretrained: pretrained/bert-base-chinese
+    bert_finetune: false
+    input_length: [39, 55, 400]
+    token_length: [8, 8, 8]
+    heads: 8
+    input_dims: [768, 709, 33]
+    hidden_dims: [128, 128, 128]
+    depth: 2
+    dropout: 0.2
+  adapter: {dim: 256, num_prompts: 8, depth: 2, heads: 4, mlp_ratio: 4, dropout: 0.2}
+  csr: {llm_path: pretrained/Qwen3-1.7B, dtype: bfloat16, refine_steps: 4, state_scale: embed,
+    max_text_tokens: 96, unk_marker: '[UNK]', sem_proj: linear, chunk_size: 16}
+  mask_missing: all
+  regression: {type: linear, out_dim: 1}

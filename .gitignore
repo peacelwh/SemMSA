@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.DS_Store
+# data, pretrained weights, checkpoints and logs are downloaded / generated
+data/*.pkl
+pretrained/
+checkpoints/
+logs/
+results/*_results.json
+results/*_results.md
+results/verify/

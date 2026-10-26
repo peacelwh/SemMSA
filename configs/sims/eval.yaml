@@ -1,0 +1,10 @@
+# Checkpoint used for each reported metric on SIMS (one best checkpoint per metric, selected at r = 0.5).
+dataset: sims
+seeds: [1111, 1112, 1113]
+metrics:
+  Mult_acc_2: {config: main, checkpoint: Mult_acc_2}
+  F1_score: {config: f1, checkpoint: Mult_acc_2}
+  Mult_acc_3: {config: reg, checkpoint: Mult_acc_3}
+  Mult_acc_5: {config: acc5, checkpoint: Mult_acc_5}
+  MAE: {config: reg, checkpoint: MAE}
+  Corr: {config: main, checkpoint: MAE}

@@ -1,0 +1,30 @@
+dataset: {name: mosi, data_path: data/mosi_unaligned_50.pkl, language: en, train_missing_shared: 0.0}
+train:
+  seed: 1111
+  epochs: 200
+  stop_epoch: 0
+  batch_size: 32
+  lr: 0.0001
+  lr_bert: 0.0001
+  weight_decay: 0.0001
+  warmup_ratio: 0.1
+  num_workers: 8
+  select_missing_rate: 0.5
+  loss: {reg_loss: l1, w_csa: 1.0, w_sep: 1.0, sigma: 1.0, tau: 1.0, power_iters: 20,
+    w_aux_sem: 1.0}
+model:
+  feature_extractor:
+    bert_pretrained: pretrained/bert-base-uncased
+    bert_finetune: true
+    input_length: [50, 500, 375]
+    token_length: [8, 8, 8]
+    heads: 8
+    input_dims: [768, 20, 5]
+    hidden_dims: [128, 128, 128]
+    depth: 2
+    dropout: 0.0
+  adapter: {dim: 256, num_prompts: 8, depth: 2, heads: 4, mlp_ratio: 4, dropout: 0.0}
+  csr: {llm_path: pretrained/Qwen3-1.7B, dtype: bfloat16, refine_steps: 4, state_scale: embed,
+    max_text_tokens: 96, unk_marker: '[UNK]', sem_proj: mlp, chunk_size: 16}
+  mask_missing: none
+  regression: {type: mlp, out_dim: 1}

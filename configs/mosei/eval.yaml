@@ -1,0 +1,12 @@
+# Checkpoint used for each reported metric on MOSEI (one best checkpoint per metric, selected at r = 0.5).
+dataset: mosei
+seeds: [1111, 1112, 1113]
+metrics:
+  Has0_acc_2: {config: has0, checkpoint: Has0_acc_2}
+  Has0_F1_score: {config: has0_f1, checkpoint: Has0_acc_2}
+  Non0_acc_2: {config: main, checkpoint: Non0_acc_2}
+  Non0_F1_score: {config: has0, checkpoint: Non0_acc_2}
+  Mult_acc_5: {config: main, checkpoint: Mult_acc_5}
+  Mult_acc_7: {config: main, checkpoint: Mult_acc_7}
+  MAE: {config: main, checkpoint: MAE}
+  Corr: {config: main, checkpoint: MAE}

@@ -1,0 +1,120 @@
+/* SemMSA project page: the template's styles (index.css) in the colours of the paper's Figure 2,
+   purple for CSA (#6B3FA0) and blue for CSR (#2F5FA8). */
+:root {
+  --primary-color: #6B3FA0;
+  --primary-hover: #55307F;
+  --secondary-color: #2F5FA8;
+  --accent-color: #2F5FA8;
+  --text-secondary: #55606E;
+  --gradient-primary: linear-gradient(135deg, #6B3FA0 0%, #2F5FA8 100%);
+  --gradient-accent: linear-gradient(135deg, #6B3FA0 0%, #2F5FA8 100%);
+}
+
+.publication-title { line-height: 1.25; }
+.accent-text { color: var(--primary-color); text-shadow: none; padding: 0; }
+.publication-authors .author-block { margin-right: 0.35rem; }
+.venue-line { color: var(--text-secondary); font-size: 1rem; margin-top: 0.4rem; }
+
+/* contents bar: sticks to the top of the window, one row, scrolls sideways on a phone */
+.toc { position: sticky; top: 0; z-index: 30; background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(6px);
+       border-bottom: 1px solid var(--border-color); }
+.toc-inner { max-width: 960px; margin: 0 auto; display: flex; gap: 0.25rem; padding: 0.45rem 1rem; overflow-x: auto;
+             white-space: nowrap; scrollbar-width: none; }
+.toc-inner::-webkit-scrollbar { display: none; }
+.toc a { flex: 0 0 auto; font-size: 0.88rem; font-weight: 600; color: var(--text-secondary); padding: 0.25rem 0.7rem;
+         border-radius: 999px; text-decoration: none; }
+.toc a:hover { color: var(--primary-color); background: rgba(107, 63, 160, 0.07); }
+.toc a.active { color: #fff; background: var(--primary-color); }
+.toc a:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+section[id] { scroll-margin-top: 3.2rem; }
+
+/* the three results at the top */
+.glance { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 0.4rem auto 0.2rem; }
+.glance-card { display: block; background: #fff; border: 1px solid #E6E9ED; border-radius: 12px; padding: 1rem 1.1rem;
+               color: #475569; transition: border-color 0.15s, box-shadow 0.15s; }
+.glance-card:hover { border-color: var(--primary-color); box-shadow: 0 6px 18px rgba(107, 63, 160, 0.10); color: #475569; }
+.glance-kicker { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--primary-color); }
+.glance-value { font-size: 2.1rem; font-weight: 800; color: #0f172a; line-height: 1.15; margin: 0.25rem 0 0.15rem; }
+.glance-value small { font-size: 1rem; font-weight: 600; color: #64748b; }
+.glance-text { font-size: 0.88rem; line-height: 1.45; }
+.glance-more { display: inline-block; margin-top: 0.5rem; font-size: 0.82rem; font-weight: 600; color: var(--primary-color); }
+
+/* figures */
+.paper-figure { margin: 1.4rem auto 0; text-align: center; }
+.paper-figure img { width: 100%; height: auto; border-radius: 8px; background: #fff; }
+.paper-figure figcaption, .table-caption { text-align: left; max-width: 960px; margin: 0.6rem auto 0; font-size: 0.92rem;
+                                            line-height: 1.5; color: var(--text-secondary); }
+.figure-label { font-weight: 700; color: #1e293b; }
+
+/* the two modules */
+.module-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1.4rem; }
+.module-card { background: #fff; border: 1px solid #E6E9ED; border-radius: 12px; padding: 1.1rem 1.2rem; }
+.module-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+.module-card.csr h3 { color: var(--secondary-color); }
+.module-card.csa h3 { color: var(--primary-color); }
+.module-card p { font-size: 0.94rem; line-height: 1.55; margin-bottom: 0.6rem; }
+.module-card .eq { overflow-x: auto; overflow-y: hidden; padding: 0.2rem 0; }
+
+/* result tables in the style of the paper */
+.paper-table-wrap { margin: 1.2rem auto 0.4rem; overflow-x: auto; }
+.paper-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; font-variant-numeric: tabular-nums; color: #1e293b; }
+.paper-table th, .paper-table td { padding: 0.4rem 0.55rem; text-align: center; vertical-align: middle; white-space: nowrap; }
+.paper-table thead tr:first-child th { border-top: 2px solid #1e293b; }
+.paper-table thead tr:last-child th { border-bottom: 1px solid #1e293b; }
+.paper-table th { font-weight: 600; line-height: 1.25; }
+.paper-table th small { font-weight: 400; color: #64748b; }
+.paper-table th.group { border-bottom: 1px solid #CBD2D9; }
+.paper-table .left { text-align: left; }
+.paper-table .sep { border-left: 1px solid #CBD2D9; }
+.paper-table tbody tr:last-child td { border-bottom: 2px solid #1e293b; }
+.paper-table tr.ours td { background: #F4EFFA; font-weight: 700; }
+.paper-table .na { color: #94a3b8; }
+
+/* efficiency cards */
+.performance-section { background: linear-gradient(135deg, rgba(47, 95, 168, 0.05) 0%, rgba(107, 63, 160, 0.04) 100%); }
+.performance-card:hover { transform: none; }
+.performance-card-title { margin-bottom: 0.75rem; }
+.metric-value { font-size: 1.6rem; line-height: 1.2; white-space: nowrap; }
+.metric-label { text-transform: none; letter-spacing: 0; font-weight: 500; }
+.benchmarks-note { margin-top: 1.25rem; color: var(--text-secondary); font-size: 0.95rem; }
+
+/* interactive chart */
+.chart-card { background: #fff; border: 1px solid #E6E9ED; border-radius: 12px; padding: 1.1rem 1.2rem 0.9rem; margin: 1.4rem auto 0; }
+.chart-card h3 { font-size: 1.05rem; font-weight: 700; color: #1e293b; margin: 0 0 0.6rem; }
+.chart-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 0.6rem; }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid #D5DAE0; border-radius: 8px; overflow: hidden; }
+.seg-btn { font: inherit; font-size: 0.82rem; font-weight: 600; color: #475569; background: #fff; border: 0;
+           border-right: 1px solid #E6E9ED; padding: 0.32rem 0.7rem; cursor: pointer; }
+.seg-btn:last-child { border-right: 0; }
+.seg-btn:hover { background: #F5F6F8; }
+.seg-btn[aria-pressed="true"] { background: #1e293b; color: #fff; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; font-size: 0.84rem; color: #475569; margin: 0 0 0.5rem; }
+.legend-item { display: inline-flex; align-items: center; gap: 0.4rem; font: inherit; color: inherit; background: none; border: 0;
+               padding: 0; cursor: pointer; }
+.legend-item[aria-pressed="false"] { opacity: 0.4; text-decoration: line-through; }
+.legend-swatch { height: 3px; width: 16px; border-radius: 2px; display: inline-block; }
+.chart-body svg { display: block; width: 100%; height: auto; overflow: visible; font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; }
+.chart-body text { font-variant-numeric: tabular-nums; }
+.chart-note { font-size: 0.8rem; color: #64748b; margin: 0.5rem 0 0; }
+.chart-tip { position: fixed; z-index: 1000; display: none; pointer-events: none; background: #fff; border: 1px solid #D5DAE0;
+             border-radius: 8px; box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12); padding: 0.45rem 0.6rem; font-size: 0.8rem;
+             color: #475569; min-width: 170px; }
+.chart-tip-title { font-weight: 600; color: #1e293b; margin-bottom: 0.25rem; }
+.chart-tip-row { display: flex; align-items: center; gap: 0.4rem; line-height: 1.5; }
+.chart-tip-row span:nth-child(2) { flex: 1; }
+.chart-tip-row strong { color: #0f172a; }
+.chart-tip-key { width: 12px; height: 3px; border-radius: 2px; flex: none; }
+
+pre#bibtex-code { white-space: pre-wrap; word-break: break-word; }
+
+@media (max-width: 768px) {
+  .glance, .module-grid { grid-template-columns: 1fr; }
+  .glance-value { font-size: 1.8rem; }
+}
+.module-card .katex-display { font-size: 0.98em; margin: 0.6em 0; }
+
+/* Hugging Face button: the logo on a white rounded tile */
+.button .icon.hf-icon { background: #fff; border-radius: 6px; width: 1.6em; height: 1.6em; padding: 0.18em; }
+.button .icon.hf-icon img { width: 100%; height: auto; display: block; }
+.publication-links .button { border-radius: 999px !important; font-size: 1.05rem; height: 2.9em; padding-left: 1.5em; padding-right: 1.6em; }
+.publication-links .button .icon:first-child:not(:last-child) { margin-right: 0.45em; }

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SemMSA: Latent Semantic-Aided Robust Multimodal Sentiment Analysis with Incomplete Data</title>
+  <meta name="description" content="SemMSA constructs sentiment-relevant latent semantics with a frozen LLM and aligns them with language, visual and acoustic representations via anchor-free spectral alignment for robust multimodal sentiment analysis with incomplete data.">
+  <meta name="keywords" content="Multimodal sentiment analysis, Incomplete data, Missing modalities, Large language models, Spectral alignment">
+  <meta name="author" content="Wenhao Li, Zhibin Wu, Chong Xiao, Qiangchang Wang">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Shandong University, Shenzhen Loop Area Institute">
+  <meta property="og:title" content="SemMSA: Latent Semantic-Aided Robust Multimodal Sentiment Analysis with Incomplete Data">
+  <meta property="og:description" content="Cross-modal Semantic Refinement with a frozen LLM and Cross-modal Spectral Alignment for robust multimodal sentiment analysis on MOSI, MOSEI and SIMS.">
+  <meta property="og:url" content="https://peacelwh.github.io/SemMSA/">
+  <meta property="og:image" content="https://peacelwh.github.io/SemMSA/static/images/framework.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" type="image/svg+xml" href="static/images/favicon.svg">
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+  <link rel="stylesheet" href="static/css/semmsa.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script defer src="static/js/page.js"></script>
+  <script defer src="static/js/charts.js"></script>
+</head>
+<body>
+
+  <button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <main id="main-content">
+
+  <!-- Title, authors, links -->
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">
+              <span class="accent-text">SemMSA</span>: Latent Semantic-Aided Robust Multimodal Sentiment Analysis with Incomplete Data
+            </h1>
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">Wenhao Li<sup>1,2</sup>,</span>
+              <span class="author-block">Zhibin Wu<sup>1</sup>,</span>
+              <span class="author-block">Chong Xiao<sup>1</sup>,</span>
+              <span class="author-block">Qiangchang Wang<sup>1&dagger;</sup></span>
+            </div>
+            <div class="is-size-5 publication-authors">
+              <span class="author-block"><sup>1</sup>School of Software, Shandong University</span>
+              <span class="author-block"><sup>2</sup>Shenzhen Loop Area Institute</span>
+              <span class="eql-cntrb"><small><br><sup>&dagger;</sup>Corresponding author</small></span>
+            </div>
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <span class="link-block">
+                  <a href="https://arxiv.org/abs/2609.30238" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="far fa-file-alt"></i></span><span>arXiv</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="https://github.com/peacelwh/SemMSA" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fab fa-github"></i></span><span>GitHub</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="https://huggingface.co/Bluexxx/SemMSA" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon hf-icon"><img src="static/images/logos/hf.svg" alt="" width="95" height="88"></span><span>Hugging Face</span>
+                  </a>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contents: stays at the top while scrolling; the section being read is highlighted -->
+  <nav class="toc" aria-label="Sections">
+    <div class="toc-inner">
+      <a href="#overview">Overview</a>
+      <a href="#motivation">Motivation</a>
+      <a href="#method">Method</a>
+      <a href="#results">Results</a>
+      <a href="#robustness">Missing rates</a>
+      <a href="#efficiency">Efficiency</a>
+      <a href="#analysis">Analysis</a>
+      <a href="#BibTeX">BibTeX</a>
+    </div>
+  </nav>
+
+  <!-- Overview: three results, and the abstract -->
+  <section class="section" id="overview">
+    <div class="container is-max-desktop">
+      <div class="glance">
+        <a class="glance-card" href="#results">
+          <div class="glance-kicker">MOSI</div>
+          <div class="glance-value">36.49 <small>Acc-7</small></div>
+          <div class="glance-text">average over missing rates 0.0&ndash;0.9, against 34.26 for the strongest baseline (LNLN).</div>
+          <span class="glance-more">Main results &rarr;</span>
+        </a>
+        <a class="glance-card" href="#results">
+          <div class="glance-kicker">MOSEI</div>
+          <div class="glance-value">48.12 <small>Acc-5</small></div>
+          <div class="glance-text">average over missing rates 0.0&ndash;0.9, against 46.64 for the strongest baseline (TF-Mamba).</div>
+          <span class="glance-more">Main results &rarr;</span>
+        </a>
+        <a class="glance-card" href="#robustness">
+          <div class="glance-kicker">SIMS</div>
+          <div class="glance-value">0.501 <small>Corr</small></div>
+          <div class="glance-text">average over missing rates 0.0&ndash;0.9, 0.087 above P-RMF (0.414).</div>
+          <span class="glance-more">Every missing rate &rarr;</span>
+        </a>
+      </div>
+    </div>
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered" style="margin-top:2.2rem">Abstract</h2>
+      <div class="content has-text-justified">
+        <p>Recent research on Multimodal Sentiment Analysis (MSA) has focused on learning from language, visual, and acoustic modalities with incomplete data to infer human sentiment. Most studies typically compensate for missing information by reconstructing modality features or designing complicated fusion mechanisms. However, these methods still suffer from spurious generation and noisy guidance due to the lack of high-level semantic grounding in partially observed multimodal evidence. To address these issues, we propose SemMSA, a latent semantic-aided framework that constructs rich sentiment-relevant semantics with LLMs, fully integrating with all modalities via anchor-free spectral alignment. It mainly consists of Cross-modal Semantic Refinement (CSR) and Cross-modal Spectral Alignment (CSA). Specifically, CSR first adaptively extracts visual and acoustic representations by corresponding adapters to form a unified multimodal prefix with language in the frozen LLM embedding space. It then iteratively produces continuous discriminative semantic states through a token-efficient latent refinement process without decoding explicit text. Next, CSA simultaneously aligns the refined semantics with all modalities by enhancing the dominant spectral component of their kernel Gram matrix. This captures global nonlinear dependencies among all representations without relying on a predefined anchor modality. In addition, an instance-level spectral separation constraint preserves cross-sample discriminability and mitigates representation collapse. Extensive experiments on SIMS, MOSI, and MOSEI benchmarks demonstrate that SemMSA achieves state-of-the-art performance.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Motivation -->
+  <section class="section hero is-light" id="motivation">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Motivation</h2>
+      <div class="content has-text-justified">
+        <p>In real-world scenarios, partial tokens, frames, or acoustic segments within each modality are often corrupted by noise, occlusion, sensor failure, or transmission instability. <strong>Reconstruction-based methods</strong> recover low-level feature patterns rather than the high-level semantics that sentiment understanding relies on, and may hallucinate features that contradict the actual sentiment evidence. <strong>Fusion-based methods</strong> integrate the available modalities through complex interaction modules, but the fused features still suffer from noisy observations and limited evidence under severe missingness. SemMSA instead compensates incomplete data at the <strong>semantic level</strong>: it refines sentiment-relevant semantics with a frozen LLM in the hidden space, without decoding explicit text, and integrates them with all modalities.</p>
+      </div>
+      <figure class="paper-figure">
+        <img src="static/images/motivation.png" alt="Comparison of reconstruction-based methods, fusion-based methods and SemMSA" width="1359" height="672" loading="lazy">
+        <figcaption><span class="figure-label">Figure 1.</span> Framework comparison between (a) reconstruction-based methods, (b) fusion-based methods, and (c) our SemMSA. Compared with existing methods, SemMSA refines and fully integrates sentiment-relevant semantic information with the LLM to compensate for incomplete data.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Method -->
+  <section class="section" id="method">
+    <div class="container is-max-widescreen">
+      <h2 class="title is-3 has-text-centered">Method</h2>
+      <figure class="paper-figure">
+        <img src="static/images/framework.png" alt="Overview of the SemMSA framework" width="1600" height="709" loading="lazy">
+        <figcaption><span class="figure-label">Figure 2.</span> Overview of the proposed SemMSA framework. Multimodal inputs with incomplete data are first extracted by encoders. Then, CSR maps visual and audio features via adapters and concatenates with language embedded in the frozen LLM space. Iterative hidden-state refinement is performed to produce compact sentiment-aware latent semantic states. Next, CSA jointly aligns the semantics with visual, acoustic, and language representations by constructing a kernel Gram matrix over normalized features and enhancing its dominant spectral component.</figcaption>
+      </figure>
+    </div>
+    <div class="container is-max-desktop">
+      <div class="module-grid">
+        <div class="module-card csr">
+          <h3>Cross-modal Semantic Refinement (CSR)</h3>
+          <p>Visual and acoustic adapters use \(M\) learnable prompts with cross- and self-attention to aggregate reliable evidence from incomplete sequences into \(Z_v, Z_a \in \mathbb{R}^{M\times d}\) in the frozen LLM embedding space. With the embedded language \(Z_l\), they form the prefix \(U^{(0)} = [Z_l; Z_v; Z_a]\). CSR then appends the last hidden state of the frozen LLM as a continuous latent token for \(O\) steps:</p>
+          <div class="eq">$$z_k = f\big(U^{(k-1)}\big),\quad U^{(k)} = \big[U^{(k-1)}; z_k\big],\quad k = 1,\dots,O,$$</div>
+          <p>yielding latent semantic states \(Z = [z_1;\dots;z_O]\) without decoding explicit text, which are pooled and projected into the semantic representation \(H_s\).</p>
+        </div>
+        <div class="module-card csa">
+          <h3>Cross-modal Spectral Alignment (CSA)</h3>
+          <p>The normalized representations \(V = (h_s, h_v, h_a, h_l)\) form an RBF kernel Gram matrix \(K = Q\Lambda Q^\top\). If the four representations are aligned, \(K\) is close to rank one, so CSA treats the eigenvalues as logits and enhances the dominant one:</p>
+          <div class="eq">$$\mathcal{L}_{csa} = -\frac{1}{N}\sum_{i=1}^{N}\log\frac{\exp(\lambda_1^i/\tau)}{\sum_{j=1}^{4}\exp(\lambda_j^i/\tau)}.$$</div>
+          <p>An instance-wise separation loss \(\mathcal{L}_{sep}\) penalizes the similarity between the dominant semantic directions \(u_1^i = V_i q_1^i / \lVert V_i q_1^i\rVert_2\) of different instances to prevent representation collapse. The aligned features are fused as \(\hat{H} = H_s + H_v + H_a + H_l\).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main results -->
+  <section class="section hero is-light" id="results">
+    <div class="container is-max-widescreen">
+      <h2 class="title is-3 has-text-centered">Main Results</h2>
+      <div class="content has-text-centered">
+        <p>Average results over random missing rates from 0.0 to 0.9 under intra-modal missingness. Acc-2 and F1 on MOSI and MOSEI are reported as negative/non-negative and negative/positive.</p>
+      </div>
+      <p class="table-caption"><span class="figure-label">Table 1.</span> The average results on MOSI and MOSEI datasets over missing rates from 0.0 to 0.9.</p>
+      <div class="table-container paper-table-wrap">
+        <table class="paper-table">
+          <thead>
+            <tr><th rowspan="2" class="left">Method</th><th colspan="6" class="group sep">MOSI</th><th colspan="6" class="group sep">MOSEI</th></tr>
+            <tr><th class="sep">Acc-2</th><th>F1</th><th>Acc-5</th><th>Acc-7</th><th>MAE &darr;</th><th>Corr &uarr;</th><th class="sep">Acc-2</th><th>F1</th><th>Acc-5</th><th>Acc-7</th><th>MAE &darr;</th><th>Corr &uarr;</th></tr>
+          </thead>
+          <tbody>
+<tr><td class="left">MISA</td><td class="sep">70.33/71.49</td><td>70.00/71.28</td><td>33.08</td><td>29.85</td><td>1.085</td><td>0.524</td><td class="sep">75.82/71.27</td><td>68.73/63.85</td><td>39.39</td><td>40.84</td><td>0.780</td><td>0.503</td></tr>
+<tr><td class="left">Self-MM</td><td class="sep">69.26/70.51</td><td>67.54/66.60</td><td>34.67</td><td>29.55</td><td>1.070</td><td>0.512</td><td class="sep">77.42/73.89</td><td>72.31/68.92</td><td>45.38</td><td>44.70</td><td>0.695</td><td>0.498</td></tr>
+<tr><td class="left">MMIM</td><td class="sep">67.06/69.14</td><td>64.04/66.65</td><td>33.77</td><td>31.30</td><td>1.077</td><td>0.507</td><td class="sep">75.89/73.32</td><td>70.32/68.72</td><td>41.74</td><td>40.75</td><td>0.739</td><td>0.489</td></tr>
+<tr><td class="left">TETFN</td><td class="sep">67.68/69.76</td><td>63.29/65.69</td><td>34.34</td><td>30.30</td><td>1.087</td><td>0.507</td><td class="sep na">&ndash;</td><td class="na">&ndash;</td><td class="na">&ndash;</td><td class="na">&ndash;</td><td class="na">&ndash;</td><td class="na">&ndash;</td></tr>
+<tr><td class="left">TFR-Net</td><td class="sep">66.35/68.15</td><td>60.06/61.73</td><td>34.67</td><td>29.54</td><td>1.200</td><td>0.459</td><td class="sep">77.23/73.62</td><td>71.99/68.80</td><td>34.67</td><td>46.83</td><td>0.697</td><td>0.489</td></tr>
+<tr><td class="left">ALMT</td><td class="sep">68.39/70.40</td><td>71.80/72.57</td><td>33.42</td><td>30.30</td><td>1.083</td><td>0.498</td><td class="sep">77.54/76.64</td><td>78.03/77.14</td><td>41.64</td><td>40.92</td><td>0.674</td><td>0.481</td></tr>
+<tr><td class="left">LNLN</td><td class="sep">70.94/72.55</td><td>71.25/72.73</td><td>38.27</td><td>34.26</td><td>1.046</td><td>0.527</td><td class="sep">78.19/76.30</td><td>79.95/77.77</td><td>46.17</td><td>45.42</td><td>0.692</td><td>0.530</td></tr>
+<tr><td class="left">P-RMF</td><td class="sep">71.53/72.81</td><td>71.69/72.93</td><td>38.50</td><td>34.19</td><td>1.038</td><td>0.525</td><td class="sep">78.83/78.14</td><td>80.39/79.33</td><td>45.87</td><td>44.63</td><td>0.658</td><td>0.589</td></tr>
+<tr><td class="left">TF-Mamba</td><td class="sep">73.46/72.54</td><td>73.59/72.57</td><td>37.74</td><td>33.95</td><td>1.035</td><td>0.548</td><td class="sep">77.34/77.61</td><td>77.18/77.43</td><td>46.64</td><td>45.66</td><td>0.673</td><td>0.578</td></tr>
+<tr class="ours"><td class="left"><strong>SemMSA (Ours)</strong></td><td class="sep">74.36/73.91</td><td>74.18/73.82</td><td>40.93</td><td>36.49</td><td>1.011</td><td>0.550</td><td class="sep">79.61/79.38</td><td>80.62/79.87</td><td>48.12</td><td>47.06</td><td>0.648</td><td>0.601</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="columns is-centered" style="margin-top:1.2rem">
+        <div class="column is-6">
+          <p class="table-caption"><span class="figure-label">Table 2.</span> The average results on SIMS dataset over missing rates from 0.0 to 0.9.</p>
+          <div class="table-container paper-table-wrap">
+            <table class="paper-table">
+              <thead>
+                <tr><th class="left">Method</th><th class="sep">Acc-2</th><th>F1</th><th>Acc-3</th><th>Acc-5</th><th>MAE &darr;</th><th>Corr &uarr;</th></tr>
+              </thead>
+              <tbody>
+<tr><td class="left">MISA</td><td class="sep">72.71</td><td>66.30</td><td>56.87</td><td>31.53</td><td>0.539</td><td>0.348</td></tr>
+<tr><td class="left">Self-MM</td><td class="sep">72.81</td><td>68.43</td><td>56.75</td><td>32.28</td><td>0.508</td><td>0.376</td></tr>
+<tr><td class="left">MMIM</td><td class="sep">69.86</td><td>66.21</td><td>56.76</td><td>31.81</td><td>0.544</td><td>0.339</td></tr>
+<tr><td class="left">TETFN</td><td class="sep">73.58</td><td>68.67</td><td>56.91</td><td>33.42</td><td>0.505</td><td>0.387</td></tr>
+<tr><td class="left">TFR-Net</td><td class="sep">68.13</td><td>58.70</td><td>52.89</td><td>26.52</td><td>0.661</td><td>0.169</td></tr>
+<tr><td class="left">ALMT</td><td class="sep">71.85</td><td>76.21</td><td>56.47</td><td>34.16</td><td>0.509</td><td>0.372</td></tr>
+<tr><td class="left">LNLN</td><td class="sep">73.15</td><td>69.18</td><td>57.32</td><td>34.68</td><td>0.515</td><td>0.387</td></tr>
+<tr><td class="left">P-RMF</td><td class="sep">73.64</td><td>74.65</td><td>54.75</td><td>34.83</td><td>0.500</td><td>0.414</td></tr>
+<tr><td class="left">TF-Mamba</td><td class="sep">74.68</td><td>72.20</td><td>55.51</td><td>34.46</td><td>0.512</td><td>0.386</td></tr>
+<tr class="ours"><td class="left"><strong>SemMSA (Ours)</strong></td><td class="sep">75.46</td><td>77.50</td><td>58.84</td><td>35.68</td><td>0.474</td><td>0.501</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="column is-6">
+          <p class="table-caption"><span class="figure-label">Table 3.</span> The F1 scores on the MOSEI dataset under varying inter-modal missing conditions.</p>
+          <div class="table-container paper-table-wrap">
+            <table class="paper-table">
+              <thead>
+                <tr><th class="left">Method</th><th>{l}</th><th>{a}</th><th>{v}</th><th>{l, a}</th><th>{l, v}</th><th>{a, v}</th><th>{l, a, v}</th><th class="sep">Avg.</th></tr>
+              </thead>
+              <tbody>
+<tr><td class="left">Self-MM</td><td>71.53</td><td>43.57</td><td>37.61</td><td>75.91</td><td>74.62</td><td>49.52</td><td>83.69</td><td class="sep">62.35</td></tr>
+<tr><td class="left">CubeMLP</td><td>67.52</td><td>39.54</td><td>32.58</td><td>71.69</td><td>70.06</td><td>48.54</td><td>83.17</td><td class="sep">59.01</td></tr>
+<tr><td class="left">DMD</td><td>70.26</td><td>46.18</td><td>39.84</td><td>74.78</td><td>72.45</td><td>52.70</td><td>84.78</td><td class="sep">63.00</td></tr>
+<tr><td class="left">MCTN</td><td>75.50</td><td>62.72</td><td>59.46</td><td>76.64</td><td>77.13</td><td>64.84</td><td>81.75</td><td class="sep">71.15</td></tr>
+<tr><td class="left">TransM</td><td>77.98</td><td>63.68</td><td>58.67</td><td>80.46</td><td>78.61</td><td>62.24</td><td>81.48</td><td class="sep">71.87</td></tr>
+<tr><td class="left">SMIL</td><td>76.57</td><td>65.96</td><td>60.57</td><td>77.68</td><td>76.24</td><td>66.87</td><td>80.74</td><td class="sep">72.09</td></tr>
+<tr><td class="left">GCNet</td><td>80.52</td><td>66.54</td><td>61.83</td><td>81.96</td><td>81.15</td><td>69.21</td><td>82.35</td><td class="sep">74.79</td></tr>
+<tr><td class="left">CorrKD</td><td>80.76</td><td>66.09</td><td>62.30</td><td>81.74</td><td>81.28</td><td>71.92</td><td>82.16</td><td class="sep">75.18</td></tr>
+<tr class="ours"><td class="left"><strong>SemMSA (Ours)</strong></td><td>83.61</td><td>66.59</td><td>65.91</td><td>85.17</td><td>84.96</td><td>72.68</td><td>86.32</td><td class="sep">77.89</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Every missing rate -->
+  <section class="section" id="robustness">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Results under Every Missing Rate</h2>
+      <div class="content has-text-justified">
+        <p>As the missing rate increases, most baselines degrade clearly, while SemMSA maintains consistently superior and more stable performance. Choose a dataset and a metric; click a method in the legend to show or hide it.</p>
+      </div>
+      <div class="chart-card" id="chart-rates">
+        <h3>Robust comparison under random missing rates 0.0&ndash;0.9</h3>
+        <div class="chart-controls"></div>
+        <div class="chart-legend"></div>
+        <div class="chart-body"></div>
+        <p class="chart-note">Values from Tables 12&ndash;14 of the paper. The full tables are also in <a href="https://github.com/peacelwh/SemMSA/blob/main/results/paper_results.md" target="_blank">results/paper_results.md</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Efficiency -->
+  <section class="section performance-section" id="efficiency">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Efficiency</h2>
+      <div class="performance-grid">
+        <div class="performance-card">
+          <h3 class="performance-card-title">Trainable params</h3>
+          <div class="performance-metrics">
+            <div class="metric-item"><span class="metric-value">113M</span><span class="metric-label">LNLN 116M &middot; P-RMF 117M</span></div>
+          </div>
+        </div>
+        <div class="performance-card">
+          <h3 class="performance-card-title">Task GFLOPs</h3>
+          <div class="performance-metrics">
+            <div class="metric-item"><span class="metric-value">4.8</span><span class="metric-label">LNLN 9.0 &middot; P-RMF 9.7</span></div>
+          </div>
+        </div>
+        <div class="performance-card">
+          <h3 class="performance-card-title">Latency</h3>
+          <div class="performance-metrics">
+            <div class="metric-item"><span class="metric-value">30.6 ms</span><span class="metric-label">LNLN 25.1 ms &middot; P-RMF 67.0 ms</span></div>
+          </div>
+        </div>
+        <div class="performance-card">
+          <h3 class="performance-card-title">Memory</h3>
+          <div class="performance-metrics">
+            <div class="metric-item"><span class="metric-value">13.0 GB</span><span class="metric-label">LNLN 12.8 GB &middot; P-RMF 13.5 GB</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="has-text-centered benchmarks-note">Table 6 of the paper, on MOSI. Trainable parameters and GFLOPs include only the modules optimized for MSA; memory and latency cover the entire pipeline with the frozen LLM. SemMSA avoids autoregressive decoding of textual descriptions and appends only a few continuous latent states.</p>
+    </div>
+  </section>
+
+  <!-- Analysis -->
+  <section class="section" id="analysis">
+    <div class="container is-max-widescreen">
+      <h2 class="title is-3 has-text-centered">Analysis</h2>
+      <figure class="paper-figure">
+        <img src="static/images/confusion.png" alt="Confusion matrices of LNLN and SemMSA on MOSI under missing rates 0.1, 0.5, 0.7 and 0.9" width="1601" height="681" loading="lazy">
+        <figcaption><span class="figure-label">Figure 4.</span> Confusion matrices of SemMSA and LNLN on the MOSI, where 0-6 denote strongly negative, negative, weakly negative, neutral, weakly positive, positive, and strongly positive, respectively. Under high missing rates, LNLN tends to concentrate predictions around middle sentiment classes, while SemMSA maintains clearer diagonal patterns.</figcaption>
+      </figure>
+      <figure class="paper-figure" style="margin-top:2.2rem">
+        <img src="static/images/case_study.png" alt="Case study on the MOSI testing set comparing P-RMF and SemMSA" width="1671" height="400" loading="lazy">
+        <figcaption><span class="figure-label">Figure 5.</span> Case study on the MOSI testing set, where SemMSA corrects challenging examples misclassified by P-RMF under incomplete multimodal inputs. Red dashed boxes denote missing or corrupted language, visual, and acoustic regions.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <div class="bibtex-header">
+        <h2 class="title">BibTeX</h2>
+        <button class="copy-bibtex-btn" onclick="copyBibTeX()" title="Copy BibTeX to clipboard">
+          <i class="fas fa-copy"></i>
+          <span class="copy-text">Copy</span>
+        </button>
+      </div>
+      <pre id="bibtex-code"><code>@article{li2026semmsa,
+  title   = {SemMSA: Latent Semantic-Aided Robust Multimodal Sentiment Analysis with Incomplete Data},
+  author  = {Li, Wenhao and Wu, Zhibin and Xiao, Chong and Wang, Qiangchang},
+  journal = {arXiv preprint arXiv:2609.30238},
+  year    = {2026}
+}</code></pre>
+    </div>
+  </section>
+  <script type="application/json" id="rate-data">{"rates":[0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9],"datasets":{"MOSI":{"metrics":[{"name":"Acc-2 (neg/non-neg)","decimals":2,"lower":false},{"name":"Acc-2 (neg/pos)","decimals":2,"lower":false},{"name":"F1 (neg/non-neg)","decimals":2,"lower":false},{"name":"F1 (neg/pos)","decimals":2,"lower":false},{"name":"Acc-5","decimals":2,"lower":false},{"name":"Acc-7","decimals":2,"lower":false},{"name":"MAE","decimals":3,"lower":true},{"name":"Corr","decimals":3,"lower":false}],"methods":{"MISA":[[81.24,79.01,76.34,74.54,72.59,69.34,65.84,63.89,62.24,58.21],[82.78,80.18,77.54,75.76,73.88,70.53,66.97,65.09,63.56,58.64],[81.23,78.97,76.3,74.51,72.49,69.2,65.69,63.74,61.67,56.19],[82.83,80.21,77.58,75.82,73.88,70.5,66.94,65.07,63.16,56.84],[48.3,46.21,41.55,38.97,35.37,30.61,27.13,23.27,20.99,18.41],[43.05,40.28,36.25,34.6,32.65,28.14,24.68,21.14,19.92,17.78],[0.771,0.847,0.939,0.989,1.041,1.124,1.2,1.257,1.311,1.369],[0.777,0.721,0.654,0.618,0.585,0.519,0.441,0.381,0.321,0.226]],"Self-MM":[[83.24,80.03,76.48,74.98,71.96,67.54,63.36,61.46,58.26,55.25],[85.22,81.4,78.15,76.37,73.17,67.43,63.47,61.74,59.55,58.59],[83.26,80.03,76.51,74.94,71.75,66.81,62.07,58.97,53.56,47.46],[85.19,81.19,77.76,75.68,71.74,64.27,58.94,55.11,49.98,46.16],[52.38,49.03,43.98,40.67,36.3,31.39,27.31,23.81,22.11,19.78],[42.81,40.33,36.64,34.89,31.2,26.97,24.34,20.7,19.29,18.32],[0.72,0.812,0.901,0.967,1.027,1.129,1.209,1.271,1.313,1.353],[0.79,0.728,0.66,0.614,0.579,0.503,0.425,0.339,0.282,0.197]],"MMIM":[[81.97,78.13,74.54,71.91,68.9,66.52,62.49,59.18,55.3,51.65],[83.43,79.98,76.42,74.08,70.84,68.09,63.67,61.23,58.53,55.29],[81.94,77.99,74.22,71.28,67.8,64.59,59.48,54.36,47.89,40.89],[83.43,79.83,76.12,73.47,69.69,66.15,60.87,57.15,52.46,47.33],[49.85,46.65,42.66,40.43,35.76,29.89,27.11,24.0,21.77,19.53],[45.92,42.61,39.07,36.83,33.38,28.23,25.41,22.35,20.26,18.95],[0.744,0.825,0.918,0.974,1.034,1.128,1.208,1.267,1.312,1.357],[0.778,0.718,0.651,0.612,0.576,0.501,0.418,0.342,0.287,0.186]],"TETFN":[[81.1,78.91,75.6,73.42,70.07,65.06,61.23,58.65,56.85,55.88],[82.62,80.59,77.49,75.25,72.05,67.23,63.42,61.13,59.4,58.43],[81.09,78.79,75.35,72.78,68.58,61.78,56.08,50.77,45.59,42.12],[82.67,80.55,77.35,74.77,70.79,64.3,58.68,53.79,48.73,45.24],[51.31,46.84,41.79,38.58,35.28,31.34,27.99,25.27,23.76,21.19],[44.07,40.67,35.81,33.24,30.66,27.55,25.12,23.13,22.01,20.75],[0.719,0.805,0.91,0.982,1.051,1.157,1.238,1.293,1.337,1.378],[0.794,0.731,0.657,0.607,0.571,0.492,0.417,0.337,0.274,0.186]],"TFR-Net":[[81.68,77.99,73.52,71.28,67.74,63.02,59.47,57.34,55.98,55.44],[83.64,79.27,74.7,72.36,68.75,64.83,61.64,59.91,58.49,57.93],[81.61,77.61,72.7,69.58,64.41,56.64,50.53,45.48,41.88,40.18],[83.57,78.7,73.57,70.12,64.71,58.04,52.44,48.41,44.7,43.01],[47.91,45.82,40.13,38.34,35.76,30.71,28.33,26.92,27.7,25.12],[40.82,38.63,34.7,32.55,30.17,25.85,24.05,23.71,23.23,21.67],[0.805,0.872,0.987,1.065,1.142,1.27,1.371,1.454,1.497,1.534],[0.76,0.705,0.622,0.572,0.537,0.443,0.363,0.276,0.155,0.155]],"LNLN":[[81.24,78.43,76.87,75.96,74.25,71.86,67.69,65.01,62.1,56.51],[84.25,81.2,79.22,77.29,76.01,73.37,69.0,65.95,62.75,56.5],[81.79,79.04,77.34,75.68,74.67,72.3,67.99,65.14,62.03,56.47],[84.61,81.62,79.53,77.56,76.31,73.7,69.19,65.95,62.56,56.32],[49.76,47.91,45.14,42.81,41.11,38.39,34.35,31.19,28.23,23.86],[44.56,42.37,39.74,38.0,36.49,33.92,30.37,27.79,26.34,22.98],[0.751,0.82,0.891,0.953,0.987,1.059,1.147,1.219,1.283,1.349],[0.778,0.724,0.668,0.617,0.594,0.536,0.458,0.383,0.314,0.202]],"P-RMF":[[82.65,81.34,78.13,75.8,73.76,71.28,67.35,65.16,61.08,58.75],[84.15,82.62,79.57,76.83,75.46,73.02,68.75,66.16,62.04,59.45],[82.69,81.35,78.11,75.82,74.09,71.66,67.64,65.33,61.22,59.01],[84.37,82.89,80.97,79.27,77.71,73.33,68.64,64.69,60.76,56.66],[48.83,47.52,44.75,42.71,40.67,37.9,33.24,32.94,29.74,26.68],[44.31,42.13,40.38,39.21,35.59,33.67,29.3,27.84,25.97,23.49],[0.726,0.8,0.853,0.922,1.001,1.077,1.147,1.229,1.275,1.346],[0.782,0.73,0.668,0.621,0.584,0.523,0.432,0.383,0.316,0.212]],"TF-Mamba":[[81.63,80.03,79.15,76.53,75.22,74.2,68.37,66.91,63.12,60.2],[83.69,81.86,80.49,77.74,76.07,75.0,68.6,67.23,63.57,60.37],[81.58,79.97,79.17,76.56,75.25,74.27,68.45,66.98,63.2,60.3],[83.71,81.87,80.56,77.85,76.16,75.15,68.79,67.41,63.77,60.59],[50.58,48.4,44.75,42.27,40.23,37.46,33.53,29.3,26.38,24.49],[44.31,42.86,39.21,37.76,35.86,33.67,30.76,27.26,24.93,22.89],[0.762,0.824,0.879,0.932,0.961,1.044,1.127,1.196,1.258,1.363],[0.774,0.732,0.693,0.645,0.617,0.557,0.487,0.411,0.353,0.215]],"SemMSA":[[86.18,82.96,80.05,79.65,77.86,74.79,70.71,67.51,64.98,58.97],[87.8,84.89,81.55,78.79,78.02,75.58,69.03,64.76,62.78,55.95],[85.99,82.77,79.88,79.43,77.67,74.62,70.58,67.31,64.81,58.79],[87.71,84.74,81.41,78.69,77.89,75.48,69.19,64.99,62.96,55.18],[53.16,49.51,47.18,46.75,44.69,40.61,37.69,33.48,30.69,25.59],[45.85,43.07,41.77,41.91,39.71,36.07,34.18,30.68,28.05,23.67],[0.657,0.761,0.838,0.889,0.937,1.025,1.139,1.232,1.278,1.357],[0.846,0.767,0.711,0.658,0.625,0.558,0.447,0.358,0.316,0.217]]}},"MOSEI":{"metrics":[{"name":"Acc-2 (neg/non-neg)","decimals":2,"lower":false},{"name":"Acc-2 (neg/pos)","decimals":2,"lower":false},{"name":"F1 (neg/non-neg)","decimals":2,"lower":false},{"name":"F1 (neg/pos)","decimals":2,"lower":false},{"name":"Acc-5","decimals":2,"lower":false},{"name":"Acc-7","decimals":2,"lower":false},{"name":"MAE","decimals":3,"lower":true},{"name":"Corr","decimals":3,"lower":false}],"methods":{"MISA":[[84.1,82.28,79.93,77.28,75.04,73.21,72.3,71.71,71.3,71.07],[85.28,82.21,77.84,73.32,70.46,67.38,65.55,64.28,63.43,62.95],[83.75,80.79,76.88,72.25,67.93,64.14,62.12,60.65,59.69,59.12],[85.1,81.28,75.56,68.91,64.02,58.38,54.64,51.82,49.95,48.8],[53.85,51.34,47.66,43.4,39.53,36.05,33.3,31.21,29.51,28.03],[51.79,50.13,47.24,43.99,40.87,38.12,36.16,34.54,33.29,32.29],[0.552,0.598,0.659,0.724,0.78,0.834,0.875,0.906,0.927,0.941],[0.759,0.722,0.674,0.615,0.561,0.492,0.415,0.344,0.267,0.18]],"Self-MM":[[84.68,83.79,82.33,79.99,78.09,75.81,73.93,72.55,71.83,71.24],[85.34,83.03,80.84,77.63,75.02,71.97,69.33,66.79,65.07,63.85],[84.66,83.23,81.17,77.74,74.48,70.38,66.76,63.45,61.49,59.72],[85.11,82.43,79.76,75.69,72.01,67.4,63.01,58.05,54.44,51.32],[55.72,53.18,50.51,48.07,45.04,43.14,41.75,40.12,38.78,37.5],[53.89,51.8,49.44,47.23,44.4,42.7,41.47,39.93,38.69,37.46],[0.531,0.564,0.604,0.653,0.694,0.733,0.762,0.786,0.805,0.821],[0.764,0.725,0.678,0.61,0.554,0.477,0.401,0.329,0.259,0.188]],"MMIM":[[81.65,81.09,79.66,77.79,76.15,74.45,73.16,72.26,71.57,71.1],[83.53,82.0,79.93,77.08,74.56,71.75,68.83,66.89,64.97,63.69],[81.41,80.15,77.68,74.49,71.4,67.96,65.43,63.26,61.45,59.99],[83.39,81.57,79.08,75.46,71.98,67.7,63.09,58.9,54.76,51.26],[53.04,51.19,47.99,44.73,41.86,39.21,37.48,35.47,33.71,32.67],[50.76,49.09,46.27,43.25,40.84,38.68,37.13,35.25,33.64,32.61],[0.576,0.602,0.642,0.69,0.732,0.775,0.808,0.834,0.858,0.877],[0.724,0.696,0.653,0.597,0.542,0.47,0.402,0.341,0.269,0.197]],"TFR-Net":[[84.65,83.31,81.61,79.29,77.65,75.69,74.05,72.77,71.95,71.34],[84.96,82.92,80.47,77.48,74.74,71.53,68.8,66.64,65.05,63.64],[84.34,82.4,79.99,76.52,73.71,70.07,67.07,64.02,61.82,59.99],[84.71,82.25,79.29,75.43,71.67,66.88,62.51,58.32,54.91,52.02],[47.91,45.82,40.13,38.34,35.76,30.71,28.33,26.92,27.7,25.12],[53.71,52.29,51.04,48.75,46.7,45.0,43.88,42.91,42.23,41.73],[0.55,0.573,0.604,0.65,0.688,0.73,0.762,0.786,0.807,0.82],[0.745,0.715,0.672,0.604,0.548,0.471,0.397,0.322,0.241,0.175]],"LNLN":[[83.61,82.73,81.68,80.45,79.7,78.1,76.5,74.74,72.86,71.51],[84.14,83.32,81.7,80.11,78.49,76.44,73.82,71.55,68.62,64.83],[84.02,82.91,81.89,80.91,80.46,79.3,78.33,77.4,76.8,77.52],[84.53,83.66,81.95,80.44,78.98,77.23,75.03,73.49,71.83,70.6],[51.94,51.25,49.95,48.4,46.88,45.59,44.0,42.56,40.97,40.19],[50.66,49.96,48.75,47.36,45.99,44.9,43.52,42.22,40.76,40.1],[0.572,0.591,0.616,0.648,0.673,0.71,0.736,0.762,0.791,0.82],[0.735,0.712,0.677,0.629,0.592,0.529,0.471,0.408,0.325,0.221]],"P-RMF":[[83.62,82.79,82.25,80.88,79.76,78.64,77.44,75.87,74.46,72.59],[85.2,83.98,82.97,81.26,79.97,78.62,76.11,74.64,70.75,67.86],[83.68,82.94,82.58,81.4,80.58,79.74,78.97,78.12,77.91,77.95],[85.48,84.37,83.37,81.86,80.74,79.49,77.58,75.88,73.03,71.51],[52.09,51.45,49.35,47.78,46.73,44.9,43.12,42.41,41.0,39.9],[49.77,49.04,47.91,45.95,45.59,43.94,42.26,41.73,40.46,39.62],[0.539,0.556,0.576,0.611,0.631,0.666,0.703,0.733,0.764,0.805],[0.767,0.748,0.722,0.683,0.653,0.601,0.545,0.481,0.401,0.289]],"TF-Mamba":[[82.89,82.68,81.84,81.22,80.02,77.94,75.77,73.49,71.6,68.68],[83.82,83.16,82.55,80.82,80.02,78.59,75.89,73.5,70.34,64.75],[82.92,82.69,81.83,81.1,79.8,77.78,75.59,73.19,71.27,68.18],[83.71,83.03,82.4,80.58,79.8,78.34,75.63,73.26,70.16,64.87],[53.83,52.07,50.5,49.0,47.8,46.6,44.73,43.4,40.93,37.56],[52.26,50.53,49.17,47.89,46.73,45.68,43.96,42.78,40.37,37.24],[0.556,0.57,0.588,0.613,0.639,0.676,0.709,0.747,0.786,0.851],[0.748,0.73,0.71,0.675,0.638,0.583,0.534,0.469,0.408,0.291]],"SemMSA":[[84.48,83.74,83.11,81.59,81.07,80.2,78.81,76.3,74.13,72.73],[86.41,85.3,83.97,82.56,81.58,80.85,79.04,75.54,70.41,68.18],[84.53,83.74,83.05,81.47,80.86,79.85,79.18,78.4,77.65,77.53],[86.32,85.17,83.85,82.41,81.38,80.58,78.6,76.84,73.03,70.57],[54.74,53.41,52.32,50.58,49.07,47.08,46.13,43.66,43.38,40.85],[52.95,51.76,50.84,49.27,47.94,46.01,45.36,43.07,42.9,40.52],[0.516,0.536,0.568,0.604,0.614,0.658,0.691,0.745,0.753,0.801],[0.799,0.774,0.738,0.692,0.664,0.602,0.541,0.469,0.419,0.316]]}},"SIMS":{"metrics":[{"name":"Acc-2","decimals":2,"lower":false},{"name":"F1","decimals":2,"lower":false},{"name":"Acc-3","decimals":2,"lower":false},{"name":"Acc-5","decimals":2,"lower":false},{"name":"MAE","decimals":3,"lower":true},{"name":"Corr","decimals":3,"lower":false}],"methods":{"MISA":[[78.19,77.39,74.33,74.11,72.87,71.26,70.46,69.95,69.37,69.22],[77.22,75.82,71.7,70.4,67.52,64.16,61.81,59.54,57.82,57.01],[63.38,63.02,59.23,59.3,57.33,54.78,53.97,52.52,52.22,52.95],[40.55,38.88,38.15,36.4,34.86,30.56,27.72,24.87,22.69,20.64],[0.449,0.461,0.489,0.505,0.523,0.552,0.578,0.601,0.61,0.617],[0.576,0.561,0.49,0.464,0.436,0.367,0.286,0.167,0.092,0.041]],"Self-MM":[[78.26,77.32,74.98,74.76,73.3,71.41,70.02,69.58,69.51,68.92],[78.0,76.76,73.71,72.85,70.36,67.11,64.21,62.28,60.68,58.32],[64.92,63.53,61.71,59.81,58.28,53.9,51.86,50.62,50.77,52.15],[40.77,40.26,38.37,37.93,34.57,32.02,29.1,25.53,22.03,22.17],[0.421,0.433,0.464,0.474,0.482,0.517,0.548,0.571,0.585,0.586],[0.584,0.563,0.5,0.487,0.479,0.39,0.313,0.198,0.138,0.111]],"MMIM":[[75.42,74.25,72.36,72.36,69.95,68.49,67.91,66.89,65.28,65.72],[73.1,72.08,69.8,69.52,66.49,64.81,63.86,62.23,60.53,59.64],[60.69,60.9,57.33,58.06,55.36,52.37,49.31,46.53,45.35,42.67],[37.42,37.27,37.27,37.71,34.57,33.41,29.18,28.59,22.32,20.35],[0.475,0.473,0.504,0.512,0.533,0.553,0.578,0.595,0.607,0.61],[0.528,0.529,0.46,0.436,0.399,0.336,0.27,0.19,0.145,0.096]],"TETFN":[[80.23,78.92,75.49,75.86,73.81,72.43,70.97,69.29,69.88,68.92],[79.25,77.7,73.59,73.28,70.66,67.3,64.19,61.09,60.92,58.75],[65.86,64.62,61.56,61.92,58.93,56.24,53.54,51.06,49.6,45.73],[41.94,41.36,39.46,38.8,35.81,33.48,29.9,27.86,23.48,22.1],[0.424,0.432,0.457,0.463,0.473,0.512,0.545,0.572,0.584,0.59],[0.589,0.578,0.527,0.521,0.504,0.394,0.309,0.19,0.154,0.108]],"TFR-Net":[[69.15,68.85,68.64,68.42,67.91,67.47,67.03,67.18,67.54,69.08],[58.44,59.38,59.74,59.88,59.16,58.66,58.3,58.15,57.55,57.71],[54.12,53.25,53.61,52.3,51.86,52.37,52.59,52.3,52.74,53.76],[33.85,30.12,29.03,27.64,25.31,24.65,24.8,23.78,22.97,23.05],[0.562,0.596,0.619,0.64,0.664,0.685,0.696,0.707,0.721,0.721],[0.254,0.203,0.191,0.182,0.176,0.171,0.157,0.163,0.1,0.088]],"P-RMF":[[78.34,77.24,76.23,75.66,75.32,73.61,72.12,71.58,69.51,66.77],[79.69,78.88,77.46,75.89,76.3,74.83,73.32,72.22,70.35,67.54],[60.61,59.52,59.3,56.89,55.8,54.83,53.05,52.52,49.89,45.08],[38.95,37.72,37.05,36.89,36.54,34.79,33.92,32.23,31.07,29.1],[0.441,0.454,0.46,0.475,0.482,0.495,0.515,0.531,0.568,0.581],[0.55,0.53,0.512,0.483,0.472,0.404,0.383,0.369,0.269,0.168]],"TF-Mamba":[[79.65,79.65,78.77,75.93,75.49,75.71,73.09,71.77,71.55,65.21],[78.92,78.79,77.88,74.72,73.72,73.61,69.44,67.46,66.58,60.87],[61.93,62.36,61.05,58.42,60.39,58.64,54.92,48.8,46.39,42.23],[37.86,36.98,38.29,39.82,40.04,37.2,32.82,28.45,26.48,26.7],[0.441,0.445,0.459,0.468,0.47,0.495,0.523,0.57,0.607,0.648],[0.548,0.55,0.507,0.485,0.477,0.424,0.37,0.248,0.139,0.114]],"SemMSA":[[80.62,79.54,77.78,78.0,75.81,73.84,72.96,72.09,72.75,71.22],[80.61,79.83,78.36,78.77,77.53,76.27,75.94,75.78,77.12,74.86],[65.15,63.39,62.52,61.21,60.98,56.6,55.74,55.52,54.21,53.11],[42.83,43.05,42.16,41.29,38.44,38.21,33.64,31.43,24.65,21.14],[0.408,0.425,0.441,0.456,0.473,0.486,0.495,0.51,0.52,0.528],[0.64,0.625,0.59,0.555,0.527,0.48,0.455,0.425,0.389,0.327]]}}}}</script>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content has-text-centered">
+            <p>
+              This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a>, which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page, following the layout of the <a href="https://dagroup-pku.github.io/PyRUA-Lean/" target="_blank">PyRUA-Lean</a> page.
+              It is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+              <br>School of Software, Shandong University &middot; Shenzhen Loop Area Institute
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

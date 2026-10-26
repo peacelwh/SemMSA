@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "semmsa"
+version = "1.0.0"
+description = "SemMSA: Latent Semantic-Aided Robust Multimodal Sentiment Analysis with Incomplete Data"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+authors = [{name = "Wenhao Li"}, {name = "Zhibin Wu"}, {name = "Chong Xiao"}, {name = "Qiangchang Wang"}]
+dependencies = ["torch>=2.1", "transformers>=4.51", "huggingface_hub>=0.25", "einops>=0.7",
+                "scikit-learn>=1.2", "numpy>=1.24", "pyyaml>=6.0"]
+
+[project.urls]
+Paper = "https://arxiv.org/abs/2609.30238"
+Homepage = "https://peacelwh.github.io/SemMSA/"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
